@@ -45,8 +45,8 @@ mod test {
         rhs_kmers.sort();
         rhs_kmers.dedup();
 
-        let lhs_kmer_frequencies = unique(lhs_kmers.iter());
-        let rhs_kmer_frequencies = unique(rhs_kmers.iter());
+        let lhs_kmer_frequencies = unique(lhs_kmers.iter().map(|x| x.clone()));
+        let rhs_kmer_frequencies = unique(rhs_kmers.iter().map(|x| x.clone()));
         let d = dot(lhs_kmer_frequencies, rhs_kmer_frequencies);
         assert_eq!(d, 96.0);
     }

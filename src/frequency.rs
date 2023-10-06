@@ -1,38 +1,38 @@
 use crate::Kmer;
 
 /// An adaptor that coverts an iterator over k-mers into a k-mer frequency iterator
-pub fn unique<'a, Src>(itr: Src) -> Unique<'a, Src>
+pub fn unique<Src>(itr: Src) -> Unique<Src>
 where
-    Src: Iterator<Item = &'a Kmer>,
+    Src: Iterator<Item = Kmer>,
 {
     Unique::new(itr)
 }
 
 /// An iterator producing k-mer frequencies.
-pub struct Unique<'a, Src>
+pub struct Unique<Src>
 where
-    Src: Iterator<Item = &'a Kmer>,
+    Src: Iterator<Item = Kmer>,
 {
     src: Src,
 }
 
-impl<'a, Src> Unique<'a, Src>
+impl<Src> Unique<Src>
 where
-    Src: Iterator<Item = &'a Kmer>,
+    Src: Iterator<Item = Kmer>,
 {
-    fn new(src: Src) -> Unique<'a, Src> {
+    fn new(src: Src) -> Unique<Src> {
         Unique { src }
     }
 }
 
-impl<'a, Src> Iterator for Unique<'a, Src>
+impl<Src> Iterator for Unique<Src>
 where
-    Src: Iterator<Item = &'a Kmer>,
+    Src: Iterator<Item = Kmer>,
 {
     type Item = (Kmer, usize);
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.src.next().map(|x| (x.clone(), 1))
+        self.src.next().map(|x| (x, 1))
     }
 }
 

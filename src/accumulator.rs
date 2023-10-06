@@ -1,7 +1,8 @@
 use std::collections::BTreeMap;
 
 use crate::{
-    counting_kmer_frequency_iterator, frequency::frequency_vector_iter, merge, unique, Kmer,
+    counting_kmer_frequency_iterator, frequency::frequency_vector_iter, merge, unique,
+    CompressedKmerFrequencyList, CompressedKmerList, Kmer,
 };
 
 /// Accumulate k-mer frequencies for small to medium k.
@@ -93,8 +94,8 @@ pub struct BigSparseAccumulator {
     k: usize,
     buffer_size: usize,
     buffer: Vec<Kmer>,
-    unique_kmers: Vec<Kmer>,
-    non_unique_kmers: Vec<(Kmer, usize)>,
+    unique_kmers: CompressedKmerList,
+    non_unique_kmers: CompressedKmerFrequencyList,
 }
 
 impl BigSparseAccumulator {
@@ -104,8 +105,8 @@ impl BigSparseAccumulator {
             k,
             buffer_size,
             buffer: Vec::with_capacity(buffer_size),
-            unique_kmers: Vec::new(),
-            non_unique_kmers: Vec::new(),
+            unique_kmers: CompressedKmerList::new(),
+            non_unique_kmers: CompressedKmerFrequencyList::new(),
         }
     }
 
@@ -140,8 +141,7 @@ impl BigSparseAccumulator {
     pub fn kmer_frequencies(&mut self) -> impl Iterator<Item = (Kmer, usize)> + '_ {
         self.flush();
         let unique_kmer_frequencies = unique(self.unique_kmers.iter());
-        let non_unique_kmer_frequencies =
-            self.non_unique_kmers.iter().map(|(x, f)| (x.clone(), *f));
+        let non_unique_kmer_frequencies = self.non_unique_kmers.iter();
         merge(unique_kmer_frequencies, non_unique_kmer_frequencies)
     }
 
@@ -152,13 +152,12 @@ impl BigSparseAccumulator {
 
         self.buffer.sort();
 
-        let mut unique_kmers = Vec::new();
-        let mut non_unique_kmers = Vec::new();
+        let mut unique_kmers = CompressedKmerList::new();
+        let mut non_unique_kmers = CompressedKmerFrequencyList::new();
         {
             let new_kmer_frequencies = counting_kmer_frequency_iterator(self.buffer.iter());
             let unique_kmer_frequencies = unique(self.unique_kmers.iter());
-            let non_unique_kmer_frequencies =
-                self.non_unique_kmers.iter().map(|(x, f)| (x.clone(), *f));
+            let non_unique_kmer_frequencies = self.non_unique_kmers.iter();
 
             for (x, f) in merge(
                 merge(new_kmer_frequencies, unique_kmer_frequencies),
@@ -200,7 +199,7 @@ mod tests {
     fn make_some_sequence(rng: &mut MiniRng) -> String {
         let mut s = String::new();
         let k: usize = 17;
-        let m = (1u64 << (2*k)) - 1;
+        let m = (1u64 << (2 * k)) - 1;
         for _i in 0..20 {
             let u = rng.rnd() & m;
             let x = Kmer::from_u64(u);
