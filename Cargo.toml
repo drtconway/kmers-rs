@@ -1,5 +1,5 @@
 [package]
-name = "kmers-rs"
+name = "kmers"
 version = "0.2.0"
 edition = "2021"
 description = "A library for k-mer manipulation."
@@ -9,3 +9,6 @@ repository = "https://github.com/drtconway/kmers-rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+[dev-dependencies]
+noodles = { version = "0.52.0", features = ["core", "fasta"] }
