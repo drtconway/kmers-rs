@@ -20,6 +20,7 @@
 mod basics;
 mod accumulator;
 mod frequency;
+mod index;
 mod list;
 mod dot;
 mod jaccard;
@@ -28,6 +29,7 @@ mod vbyte;
 pub use basics::*;
 pub use accumulator::*;
 pub use frequency::*;
+pub use index::*;
 pub use list::*;
 pub use dot::*;
 pub use jaccard::*;

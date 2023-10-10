@@ -61,9 +61,11 @@ impl Decoder8 {
     }
 }
 
+#[allow(dead_code)]
 pub struct Encoder16 {}
 
 impl Encoder16 {
+    #[allow(dead_code)]
     pub fn encode(x: u64, sink: &mut Vec<u16>) {
         if x <= 0x7fff {
             sink.push((x << 1) as u16);
@@ -87,9 +89,11 @@ impl Encoder16 {
     }
 }
 
+#[allow(dead_code)]
 pub struct Decoder16 {}
 
 impl Decoder16 {
+    #[allow(dead_code)]
     pub fn decode<'a, I>(iter: &mut I) -> Option<u64>
     where
         I: Iterator<Item = &'a u16>,

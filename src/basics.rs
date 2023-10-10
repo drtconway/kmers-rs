@@ -97,6 +97,41 @@ impl Kmer {
         }
     }
 
+    /// Extract k-mers with a zero-based position from both strands of a byte sequence.
+    ///
+    pub fn with_many_both_pos<S, F>(k: usize, seq: &S, mut f: F) -> ()
+    where
+        S: AsRef<[u8]>,
+        F: FnMut(usize, &Kmer, &Kmer),
+    {
+        let shift = 2 * (k - 1);
+        let msk: u64 = (1 << (2 * k)) - 1;
+        let mut x = Kmer(0);
+        let mut y = Kmer(0);
+        let mut i = 0;
+        let mut pos = 0;
+        for c in seq.as_ref() {
+            match Kmer::byte(*c) {
+                None => {
+                    i = 0;
+                    x.0 = 0;
+                    y.0 = 0;
+                }
+                Some(b) => {
+                    x.0 = (x.0 << 2) | b.0;
+                    y.0 = (y.0 >> 2) | ((3 - b.0) << shift);
+                    i += 1;
+                    if i == k {
+                        x.0 &= msk;
+                        f(pos, &x, &y);
+                        i -= 1;
+                    }
+                }
+            }
+            pos += 1;
+        }
+    }
+    
     /// Convert a character to a 1-mer.
     #[inline]
     pub fn base(c: char) -> Option<Kmer> {
