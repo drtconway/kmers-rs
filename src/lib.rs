@@ -24,6 +24,7 @@ mod index;
 mod list;
 mod dot;
 mod jaccard;
+mod canonical;
 mod vbyte;
 
 pub use basics::*;
@@ -33,3 +34,4 @@ pub use index::*;
 pub use list::*;
 pub use dot::*;
 pub use jaccard::*;
+pub use canonical::*;
